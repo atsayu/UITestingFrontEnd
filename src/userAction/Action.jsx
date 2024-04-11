@@ -8,11 +8,14 @@ import { CheckboxAction } from './Checkbox';
 import { VerifyURlAction } from './VerifyURLAction';
 import { OrExpression } from './OrExpression';
 import Flow from './Flow';
+import { OpenURLAction } from './OpenURL';
 
 
 const Action = (info) => {
     console.log(info.type);
   switch(info.type) {
+    case "open":
+        return <OpenURLAction actionIndexes={info.actionIndexes} testcaseIndex={info.testcaseIndex}/>
     case "click":
         return <ClickAction target={info.target} actionIndexes={info.actionIndexes} testcaseIndex={info.testcaseIndex}/>
     case "and":

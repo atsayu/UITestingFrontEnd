@@ -89,7 +89,7 @@ export default function TestSuite() {
         
         if (action.type === 'click' || action.type === 'input' || action.type === 'verifyURL') {
             return action.value || action.url || '';
-        } else {
+        } else if (action.type !== 'open') {
             const children = action.actions;
             const childrenExpression = [];
             children.forEach((child) => {
@@ -99,6 +99,8 @@ export default function TestSuite() {
             const outputExpression = childrenExpression.join(typeToOperator[action.type]);
             if (childrenExpression.length > 1) return `(${outputExpression})`;
             else return outputExpression;
+        } else {
+            return '';
         }
     }
 

@@ -61,6 +61,25 @@ export const testActionSlice = createSlice({
                 describedLocator: action.payload.locator
             })
         },
+        addOpenURLAction: (state, action) => {
+            const actionIndexes = action.payload.actionIndexes;
+            let tempAction = state.testcases[action.payload.testcaseIndex]; 
+            actionIndexes.forEach(index => {
+                tempAction = tempAction.actions[index];
+            })
+            tempAction.actions.push({
+                type: 'open',
+                url: action.payload.url,
+            });
+        },
+        changeURL: (state, action) => {
+            const actionIndexes = action.payload.actionIndexes;
+            let tempAction = state.testcases[action.payload.testcaseIndex]; 
+            actionIndexes.forEach(index => {
+                tempAction = tempAction.actions[index];
+            })
+            tempAction.url = action.payload.newURL;
+        },
         addInputAction: (state, action) => {
             const actionIndexes = action.payload.actionIndexes;
             let tempAction = state.testcases[action.payload.testcaseIndex]; 
@@ -211,6 +230,6 @@ export const testActionSlice = createSlice({
  
 })
 
-export const {addTestCase,changeFlow,addMultipleActions, changeTestCaseName ,addFlowDescribe, addAndAction, addOrAction, addClickAction, addInputAction,addVerifyURLAction, changeExpectedURL,chageFlow, changeDescribedLocator, setVerifyActionExist, changeValue, deleteAction, toogleSelectAction, addAssertUrlAction, addAssertElementAction, addSelectAction, addCheckboxAction} = testActionSlice.actions;
+export const { addTestCase, addOpenURLAction, changeURL, changeFlow, addMultipleActions, changeTestCaseName, addFlowDescribe, addAndAction, addOrAction, addClickAction, addInputAction, addVerifyURLAction, changeExpectedURL, chageFlow, changeDescribedLocator, setVerifyActionExist, changeValue, deleteAction, toogleSelectAction, addAssertUrlAction, addAssertElementAction, addSelectAction, addCheckboxAction } = testActionSlice.actions;
 
 export default testActionSlice.reducer;
