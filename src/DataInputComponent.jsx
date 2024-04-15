@@ -2,6 +2,9 @@
 import { InputComponent } from './components/InputComponent'
 import { Button, Input } from '@mui/material';
 
+
+
+
 export default function DataInputComponent({ data, setNewData, variables, updateStoredData, storedData }) {
   console.log(storedData);
   const handleChange = (index, e) => {
@@ -34,7 +37,6 @@ export default function DataInputComponent({ data, setNewData, variables, update
         })
       }
       {
-
         storedData &&
           storedData.map((userData, index) => {
             return (
@@ -45,7 +47,7 @@ export default function DataInputComponent({ data, setNewData, variables, update
           })
       }
 
-      <Button onClick={storeData}>ADD NEW Data</Button>
+      <Button size="small" variant='contained' onClick={storeData}>ADD NEW Data</Button>
     </div>
 
 

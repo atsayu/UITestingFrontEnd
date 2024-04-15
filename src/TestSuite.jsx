@@ -106,7 +106,7 @@ export default function TestSuite() {
 
     const sendTestCaseAndData = () => {
         const obj = {};
-        obj.url = url;
+        obj.url = testcases[0].actions[0].url;
         obj.testcases = JSON.parse(JSON.stringify(testcases));
         // const haveAssertMap = {};
         obj.testcases.forEach((testcase, index) => {
@@ -143,10 +143,43 @@ export default function TestSuite() {
             setTestScript(data);
         })
     }
+
+    const requestRunScript = () => {
+        fetch("http://localhost:8081/robot/run", {
+            headers: {
+                'content-type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST,PATCH,OPTIONS'
+            },
+            method: "GET",
+        }).then((response) => {
+            return response.blob();
+        }).then((blob) => {
+            
+            const url = window.URL.createObjectURL(blob);
+                  
+                  // Create a temporary link element
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.setAttribute('download', "report.zip");
+                  
+                  // Append the link to the document body and click it programmatically
+                  document.body.appendChild(link);
+                  link.click();
+                  
+                  // Cleanup
+                  document.body.removeChild(link);
+                  window.URL.revokeObjectURL(url);
+          })
+          .catch((error) => {
+        
+            console.error('There was a problem with your fetch operation:', error);
+          }); 
+    }
     return (
-        <div style={{ fontFamily: 'sans-serif' }}>
-            <UrlComponent setUrl={setUrl} url={url} />
-            <Button size="small" onClick={handleAddTestCase}>
+        <div style={{fontFamily: 'sans-serif', margin: '5px'}}>
+            {/* <UrlComponent setUrl={setUrl} url={url} /> */}
+            <Button size="small" variant='contained' size="small" onClick={handleAddTestCase}>
                 <AddIcon />
                 <span>New Test Case</span>
             </Button>
@@ -155,8 +188,10 @@ export default function TestSuite() {
                     return <TestCase key={index} testcaseIndex={index} actionIndexes={[]} />
                 })
             }
-            <div>
-                <Button onClick={() => {
+            {
+                testcases.length > 0 &&
+                <div>
+                <Button size="small" variant='contained' onClick={() => {
                     setIsInputData(true);
                     console.log(testcases[0].actions);
                     testcases[0].actions.forEach((action) => {
@@ -171,9 +206,10 @@ export default function TestSuite() {
                 {
                     isInputData && <DataInputComponent data={data} setNewData={setNewData} updateStoredData={updateStoredData} variables={variableExpressions} storedData={storedData}/>
                 }
-                <Button onClick={sendTestCaseAndData}>Generate Script</Button>
-                <Button>RUN SCRIPT</Button>
+                <Button style={{margin: '5px'}} size="small" variant='contained' onClick={sendTestCaseAndData}>Generate Script</Button>
+                {testScript !== '' && <Button onClick={requestRunScript} size="small" variant='contained'>RUN SCRIPT</Button>}  
             </div>
+            }
             {testScript !== "" && <TestScript script={testScript}/>}
 
         </div>
