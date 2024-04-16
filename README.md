@@ -3,10 +3,10 @@
 Robot Framework TestScript Generation for UI Testing
 
 ## Requirements
-NodeJs
-JDK17 hoặc mới hơn
-Python
-Pyeda
+NodeJs  
+JDK17 hoặc mới hơn  
+Python  
+Pyeda  
 [ChromeDriver](https://chromedriver.chromium.org/) cùng phiên bản với GoogleChrome:
 - Windows: Thêm đường dẫn tới thư mục chứa file executable vào biến môi trường `PATH`
 - MacOS: Đặt file executable vào thư mục `/usr/local/bin`
