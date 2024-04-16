@@ -5,7 +5,7 @@ import { changeUserClickActionTarget } from "../redux/actions"
 import { useDispatch, useSelector } from "react-redux"
 import { changeDescribedLocator } from "../redux/testActionSlice";
 
-export function ClickAction({actionIndexes, testcaseIndex}) {
+export function ClickAction({actionIndexes, testcaseIndex, setCurrentData}) {
     const dispatch = useDispatch();
     const describedLocator = useSelector(state => {
         let action =  state.testAction.testcases[testcaseIndex];
@@ -23,7 +23,7 @@ export function ClickAction({actionIndexes, testcaseIndex}) {
     return (
         <div>
             <span>Click: </span>
-            <InputComponent initialValue={describedLocator || ""} onChange={handleChange}/>
+            <Input defaultValue ={describedLocator || ""} onChange={handleChange} disabled/>
         </div>
         
     )

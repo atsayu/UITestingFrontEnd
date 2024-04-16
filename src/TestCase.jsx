@@ -8,7 +8,7 @@ import { addUserClickActionEvent, addUserAndExpressionEvent } from "./redux/acti
 import { addAndAction, addCheckboxAction, addClickAction, addFlowDescribe, addInputAction, addOrAction, addSelectAction, addVerifyURLAction, changeTestCaseName } from "./redux/testActionSlice";
 
 
-export function TestCase({testcaseIndex, actionIndexes}) {
+export function TestCase({testcaseIndex, actionIndexes, currentData, handleSetCurrentData}) {
     const actions = useSelector(state => state.testAction.testcases[testcaseIndex].actions);
     console.log(actions);
     const dispatch = useDispatch();
@@ -113,7 +113,7 @@ export function TestCase({testcaseIndex, actionIndexes}) {
                 actions.map((action, index) => {
                     return (
                         <ListItem key={index} sx={{display: "list-item"}}>
-                            <Action {...action} actionIndexes={[...actionIndexes, index]} testcaseIndex={testcaseIndex}/>
+                            <Action {...action} actionIndexes={[...actionIndexes, index]} testcaseIndex={testcaseIndex} currentData={currentData} handleSetCurrentData={handleSetCurrentData}/>
                         </ListItem>
                     )
                 })

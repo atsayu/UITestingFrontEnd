@@ -21,13 +21,13 @@ const Action = (info) => {
     case "and":
         return <AndExpression actions={info.children} actionIndexes={info.actionIndexes} testcaseIndex={info.testcaseIndex}/>
     case "input":
-        return <InputAction actionIndexes={info.actionIndexes} testcaseIndex={info.testcaseIndex}/>
+        return <InputAction actionIndexes={info.actionIndexes} testcaseIndex={info.testcaseIndex} currentData={info.currentData} handleSetCurrentData={info.handleSetCurrentData}/>
     case "select": 
         return <SelectAction actionIndexes={info.actionIndexes} testcaseIndex={info.testcaseIndex}/>
     case "checkbox":
         return <CheckboxAction actionIndexes={info.actionIndexes} testcaseIndex={info.testcaseIndex}/>
     case "verifyURL":
-        return <VerifyURlAction actionIndexes={info.actionIndexes} testcaseIndex={info.testcaseIndex}/>
+        return <VerifyURlAction actionIndexes={info.actionIndexes} testcaseIndex={info.testcaseIndex} currentData={info.currentData} handleSetCurrentData={info.handleSetCurrentData}/>
     case "or":
         return <OrExpression actions={info.children} actionIndexes={info.actionIndexes} testcaseIndex={info.testcaseIndex} />
     case "flow":

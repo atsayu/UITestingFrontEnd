@@ -5,7 +5,7 @@ import { changeUserClickActionTarget } from "../redux/actions"
 import { useDispatch, useSelector } from "react-redux"
 import { changeDescribedLocator, changeValue } from "../redux/testActionSlice";
 
-export function InputAction({ actionIndexes, testcaseIndex }) {
+export function InputAction({ actionIndexes, testcaseIndex, currentData, handleSetCurrentData }) {
     const dispatch = useDispatch();
     const value = useSelector(state => {
         let action = state.testAction.testcases[testcaseIndex];
@@ -23,9 +23,14 @@ export function InputAction({ actionIndexes, testcaseIndex }) {
         return action.describedLocator;
     })
 
-    const handleChangeValue = (e) => {
-        const newValue = e.target.value;
-        dispatch(changeValue({ testcaseIndex, actionIndexes, newValue }))
+    const handleChangeValueData = (e) => {
+        const newValueData= e.target.value;
+        // dispatch(changeValue({ testcaseIndex, actionIndexes, newValue }))
+        console.log(value, newValueData);
+        handleSetCurrentData({
+            ...currentData,
+            [value]: newValueData
+        });
     }
 
     const handleChangeLocator = (e) => {
@@ -36,15 +41,18 @@ export function InputAction({ actionIndexes, testcaseIndex }) {
         <div>
             <span>Fill </span>
             <Input
-                defaultValue={value || ""}
-                onChange={handleChangeValue}
+                value={currentData[value]}
+                onChange={handleChangeValueData}
                 inputProps={{ style: { textAlign: "center", fontStyle: "italic" } }}
+                placeholder={value}
+                required
             />
             <span> into </span>
             <Input
                 defaultValue={describedLocator || ""}
                 onChange={handleChangeLocator}
                 inputProps={{ style: { textAlign: "center", fontStyle: "italic" } }}
+                disabled
             />
         </div>
 

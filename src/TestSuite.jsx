@@ -20,45 +20,35 @@ export default function TestSuite() {
     const [data, setData] = useState([]);
     const [storedData, setStoredData] = useState([]);
     const [variableExpressions, setVariableExpressions] = useState([]);
+    const [currentData, setCurrentData] = useState({});
 
-    const valueVariables = useSelector((state) => {
-        const testcases = state.testAction.testcases;
-        const arr = [];
-        testcases.forEach((testcase) => {
-            const newArr = find(testcase.actions);
-            arr.push(...newArr);
+    // const valueVariables = useSelector((state) => {
+    //     const testcases = state.testAction.testcases;
+    //     const arr = [];
+    //     testcases.forEach((testcase) => {
+    //         const newArr = find(testcase.actions);
+    //         arr.push(...newArr);
 
-        })
-        return [...new Set(arr)];
-    })
+    //     })
+    //     return [...new Set(arr)];
+    // })
     const handleAddTestCase = () => {
-        // dispatch({type: 'ADD_TEST_CASE'});
-        // dispatch(addUserClickAction());
         dispatch(addTestCase());
     }
-    function find(actions) {
-        const arr = [];
-        actions.forEach((action) => {
-            if (action.type !== 'and' && action.type !== 'or') {
-                if (action.value) arr.push(action.value);
-                if (action.url) arr.push(action.url);
-            }
+    // function find(actions) {
+    //     const arr = [];
+    //     actions.forEach((action) => {
+    //         if (action.type !== 'and' && action.type !== 'or') {
+    //             if (action.value) arr.push(action.value);
+    //             if (action.url) arr.push(action.url);
+    //         }
 
-            else {
-                arr.push(...find(action.actions));
-            }
-        })
-        return arr;
-    }
-    function findAllByKey(obj, keyToFind) {
-        return Object.entries(obj)
-            .reduce((acc, [key, value]) => (key === keyToFind)
-                ? acc.concat(value)
-                : (typeof value === 'object')
-                    ? acc.concat(findAllByKey(value, keyToFind))
-                    : acc
-                , [])
-    }
+    //         else {
+    //             arr.push(...find(action.actions));
+    //         }
+    //     })
+    //     return arr;
+    // }
     const setNewData = (newData) => {
         setData(newData);
     }
@@ -151,7 +141,7 @@ export default function TestSuite() {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'POST,PATCH,OPTIONS'
             },
-            method: "GET",
+            method: "GET", 
         }).then((response) => {
             return response.blob();
         }).then((blob) => {
@@ -176,16 +166,45 @@ export default function TestSuite() {
             console.error('There was a problem with your fetch operation:', error);
           }); 
     }
+
+    const handleSetCurrentData = (data) => {
+        setCurrentData(data);
+    }
+
+    const addNewData = () => {
+        testcases[0].actions.forEach((action) => {
+            console.log(action);
+            let expression = createVariableExpression(action);
+            if (expression[0] === '(') expression = expression.slice(1, -1);
+            if (expression) setVariableExpressions(prev => [...prev, expression]);
+        });
+        
+        console.log(currentData);
+        const newDataObj = {};
+
+        variableExpressions.forEach((exprVariable, index) => {
+            let s = exprVariable;
+            const singleVariable = s.split(/\s*[&|]\s*/);
+            console.log(singleVariable);
+            singleVariable.forEach((variable) => {
+                s = s.replace(variable, currentData[variable]);
+            })
+            newDataObj[exprVariable] = s;
+        })
+        console.log(newDataObj);
+        storedData.push(newDataObj);
+        
+    }
     return (
         <div style={{fontFamily: 'sans-serif', margin: '5px'}}>
             {/* <UrlComponent setUrl={setUrl} url={url} /> */}
-            <Button size="small" variant='contained' size="small" onClick={handleAddTestCase}>
+            <Button size="small" variant='contained' onClick={handleAddTestCase}>
                 <AddIcon />
                 <span>New Test Case</span>
             </Button>
             {
                 testcases.map((testcase, index) => {
-                    return <TestCase key={index} testcaseIndex={index} actionIndexes={[]} />
+                    return <TestCase key={index} testcaseIndex={index} actionIndexes={[]} currentData={currentData} handleSetCurrentData={handleSetCurrentData}/>
                 })
             }
             {
@@ -203,8 +222,14 @@ export default function TestSuite() {
                     const newData = valueVariables.map((value) => "");
                     setData(newData);
                 }}>Input data</Button>
-                {
+                <Button onClick={addNewData}>Add data</Button>
+                {/* {
                     isInputData && <DataInputComponent data={data} setNewData={setNewData} updateStoredData={updateStoredData} variables={variableExpressions} storedData={storedData}/>
+                } */}
+                {
+                    storedData.map((data, index) => {
+                        JSON.stringify(data);
+                    })
                 }
                 <Button style={{margin: '5px'}} size="small" variant='contained' onClick={sendTestCaseAndData}>Generate Script</Button>
                 {testScript !== '' && <Button onClick={requestRunScript} size="small" variant='contained'>RUN SCRIPT</Button>}  
