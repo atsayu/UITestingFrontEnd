@@ -2,6 +2,10 @@ import { Button, Input, Switch, FilledInput } from "@mui/material";
 import { NestedDropdown } from "mui-nested-menu";
 import Action from "./userAction/Action";
 import { List } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 import { useState } from "react";
 import TestOutline from "./components/TestOutline";
 import TestActionList from "./components/TestActionList";
@@ -10,6 +14,7 @@ import TestScript from "./TestScript";
 
 
 export function TestCase() {
+    const [isLoading, setIsLoading] = useState(false);
     const [isInputTestData, setIsInputTestData] = useState(false);
     const [flow, setFlow] = useState("");
     const [name, setName] = useState("");
@@ -48,32 +53,35 @@ export function TestCase() {
         setTestDataList([...testDataList, newTestData]);
     }
 
-
+    function clearTestData() {
+        setTestDataList([]);
+    }
 
     const createVariableExpression = (action) => {
         const typeToOperator = {
-          'or': ' | ',
-          'and': ' & '
+            'or': ' | ',
+            'and': ' & '
         };
-    
+
         if (action.type === 'click' || action.type === 'input' || action.type === 'verifyURL') {
-          return action.value || action.url || '';
+            return action.value || action.url || '';
         } else if (action.type !== 'open') {
-          const children = action.actions;
-          const childrenExpression = [];
-          children.forEach((child) => {
-            const expression = createVariableExpression(child);
-            if (expression !== '') childrenExpression.push(expression);
-          });
-          const outputExpression = childrenExpression.join(typeToOperator[action.type]);
-          if (childrenExpression.length > 1) return `(${outputExpression})`;
-          else return outputExpression;
+            const children = action.actions;
+            const childrenExpression = [];
+            children.forEach((child) => {
+                const expression = createVariableExpression(child);
+                if (expression !== '') childrenExpression.push(expression);
+            });
+            const outputExpression = childrenExpression.join(typeToOperator[action.type]);
+            if (childrenExpression.length > 1) return `(${outputExpression})`;
+            else return outputExpression;
         } else {
-          return '';
+            return '';
         }
-      }
-    
+    }
+
     function sendRequestGenScript() {
+        setIsLoading(true);
         const testcase = {};
         testcase.actions = actions;
         testcase.scenario = name;
@@ -97,14 +105,67 @@ export function TestCase() {
         }).then((data) => {
             console.log(data);
             setTestScript(data);
-        })
+            setIsLoading(false);
+        }).catch(err => {
+            console.log("Error request create script: ", err);
+            setIsLoading(false);
+        });
+    }
+
+    function sendRequestRunScript() {
+        setIsLoading(true);
+        fetch("http://localhost:8081/run/robot", {
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST,PATCH,OPTIONS'
+            },
+            responseType: 'blob',
+            method: "GET",
+        }).then((response) => {
+            if (!response.ok) {
+                throw new Error('Failed to download zip file');
+            }
+            return response.blob();
+        }).then((blob) => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'output.zip';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            setIsLoading(false);
+        }).catch(err => {
+            console.log("Error: ", err);
+            setIsLoading(false);
+        });
     }
     return (
-        <div style={{ border: '1px solid black', margin: '5px', padding: '5px', borderRadius: '5px'}}>
-            <h1 style={{textAlign: 'center', fontFamily: 'sans-serif'}}>UET UI Testing</h1>
+        <div style={{ border: '1px solid black', margin: '5px', padding: '5px', borderRadius: '5px', fontFamily: 'sans-serif' }}>
+            <Backdrop
+                sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                open={isLoading}
+            >
+                <CircularProgress color="inherit" />
+                Processing request...
+            </Backdrop>
+            <h1 style={{ textAlign: 'center', fontFamily: 'sans-serif' }}>UET UI Testing</h1>
             <div>
-                <Switch checked={isInputTestData}
-                    onChange={() => setIsInputTestData(!isInputTestData)} />
+                {
+                    isInputTestData
+                    && <Button style={{ margin: '10px', padding: '2px' }}
+                        size="small" variant="contained"
+                        onClick={() => {
+                            setIsInputTestData(false);
+                            clearTestData();
+                            setTestScript(undefined);
+                        }}
+                        startIcon={<ArrowBackIosNewIcon />}
+                        // endIcon={<EditIcon />}
+                    >
+                        Change Actions
+                    </Button>
+                }
             </div>
             <span>Scenario: </span>
             {/* <Input value={name} placeholder="Test Case Name" onChange={changeName} /> */}
@@ -115,21 +176,25 @@ export function TestCase() {
                 inputProps={{ style: { textAlign: "center", fontStyle: "italic", padding: 0 } }}
             />
             {
-                isInputTestData? 
-                <TestActionList actions={actions} variableExpressions={variableExpressions} tempData={tempData} changeTempData={changeTempData} addTestData={addTestData}/> 
-                : <TestOutline flow={flow} changeActionList={changeActionList} setNewFlow={setNewFlow} />
+                isInputTestData ?
+                    <TestActionList actions={actions} variableExpressions={variableExpressions} tempData={tempData} changeTempData={changeTempData} addTestData={addTestData} />
+                    : <TestOutline clearTestData={clearTestData} flow={flow} changeActionList={changeActionList} setNewFlow={setNewFlow} />
             }
             {
                 isInputTestData && testDataList.length > 0
-                && <DataTable variableExpressions={variableExpressions} dataList={testDataList}/>
+                && <DataTable variableExpressions={variableExpressions} dataList={testDataList} />
             }
             {
-                isInputTestData && testDataList.length > 0 
-                && <Button style={{marginTop: '10px'}} size="small" variant="contained" onClick={sendRequestGenScript}>Generate Script</Button>
+                isInputTestData && testDataList.length > 0
+                && <Button style={{ marginTop: '10px' }} size="small" variant="contained" onClick={sendRequestGenScript}>Generate Script</Button>
             }
             {
-                isInputTestData &&testScript
-                && <TestScript script={testScript}/>
+                isInputTestData && testScript
+                && <TestScript script={testScript} />
+            }
+            {
+                isInputTestData && testScript
+                && <Button style={{ marginTop: '10px' }} size="small" variant="contained" onClick={sendRequestRunScript}>Run Script</Button>
             }
         </div>
     );

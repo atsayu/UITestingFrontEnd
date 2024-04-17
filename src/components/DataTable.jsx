@@ -8,7 +8,7 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 export default function DataTable({dataList, variableExpressions}) {
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} style={{marginTop: '20px'}}>
       <Table size="small" aria-label="test data table">
         <TableHead>
           <TableRow>

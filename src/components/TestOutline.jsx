@@ -4,7 +4,6 @@ export default function TestOutline({flow, setNewFlow, changeActionList}) {
     function turnFlowToAction() {
         const lines = flow.split("\n");
         fetch("http://localhost:8081/parse-flow", {
-            
             body: JSON.stringify(lines),
             headers: {
                 'content-type': 'application/json',
