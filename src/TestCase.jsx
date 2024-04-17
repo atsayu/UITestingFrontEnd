@@ -1,127 +1,136 @@
-import { IconButton, ListItem } from "@mui/material";
-import { InputComponent } from "./components/InputComponent";
+import { Button, Input, Switch, FilledInput } from "@mui/material";
 import { NestedDropdown } from "mui-nested-menu";
 import Action from "./userAction/Action";
 import { List } from '@mui/material';
-import { useDispatch, useSelector } from "react-redux";
-import { addUserClickActionEvent, addUserAndExpressionEvent } from "./redux/actions";
-import { addAndAction, addCheckboxAction, addClickAction, addFlowDescribe, addInputAction, addOrAction, addSelectAction, addVerifyURLAction, changeTestCaseName } from "./redux/testActionSlice";
+import { useState } from "react";
+import TestOutline from "./components/TestOutline";
+import TestActionList from "./components/TestActionList";
+import DataTable from "./components/DataTable";
+import TestScript from "./TestScript";
 
 
-export function TestCase({testcaseIndex, actionIndexes}) {
-    const actions = useSelector(state => state.testAction.testcases[testcaseIndex].actions);
-    console.log(actions);
-    const dispatch = useDispatch();
+export function TestCase() {
+    const [isInputTestData, setIsInputTestData] = useState(false);
+    const [flow, setFlow] = useState("");
+    const [name, setName] = useState("");
+    const [actions, setActions] = useState([]);
+    const [testDataList, setTestDataList] = useState([]);
+    const [tempData, setTempData] = useState({});
+    const [variableExpressions, setVariableExpressions] = useState([]);
+    const [testScript, setTestScript] = useState();
 
-    const handleAddClickAction = () => {
-        // dispatch({type: 'ADD_USER_ACTION_CLICK', index})
-        
-        dispatch(addClickAction({testcaseIndex, actionIndexes}));
-    }
-
-    const handleAddAndExpression = () => {
-        // dispatch(addUserAndExpressionEvent(testcaseIndex, actionIndexes: []));
-        dispatch(addAndAction({testcaseIndex, actionIndexes}));
-    }
-
-    const handleAddInputAction = () => {
-        dispatch(addInputAction({testcaseIndex, actionIndexes}));
-    }
-
-    const handleAddSelect = () => {
-        dispatch(addSelectAction({testcaseIndex, actionIndexes}));
-    }
-
-    const handleAddCheckbox = () => {
-        dispatch(addCheckboxAction({testcaseIndex, actionIndexes}));
-    }
-
-    const handleAddFlow = () => {
-        dispatch(addFlowDescribe({testcaseIndex, actionIndexes}));
-    }
-
-    const handleAddVerifyURL = () => {
-        dispatch(addVerifyURLAction({testcaseIndex, actionIndexes}));
-    }
-
-    const handleAddOrExpression = () => {
-        dispatch(addOrAction({testcaseIndex, actionIndexes}));
-    }
-    
-    const menuItemsData = {
-        label:'Add action',
-        items:[
-            {
-                label: 'Actions flow',
-                callback: handleAddFlow
-            },
-    
-            {
-                label: 'Normal actions',
-                items:[
-                    {
-                        label: 'Click Element',
-                        callback: handleAddClickAction
-                    },
-                    {
-                        label: 'Input text',
-                        callback: handleAddInputAction
-                    },
-                    {
-                        label: 'Checkbox',
-                        callback: handleAddCheckbox
-                    },
-                    {
-                        label: 'Select',
-                        callback: handleAddSelect
-                    },
-                    {
-                        label: 'And Expression',
-                        callback: handleAddAndExpression
-                    },
-                    {
-                        label: 'Or Expression',
-                        callback: handleAddOrExpression
-                    }
-                ],
-            },
-            {
-                label: 'Verify Actions',
-                items: [
-                    {
-                        label: 'Verify URL',
-                        callback: handleAddVerifyURL
-                    }
-                ]
-            }
-        ],
-            
-    }
-    
     function changeName(e) {
         const newName = e.target.value;
-        dispatch(changeTestCaseName({testcaseIndex, newName}));
-    } 
+        setName(newName);
+    }
 
+    function setNewFlow(newFlow) {
+        setFlow(newFlow);
+    }
+
+    function changeTempData(newTempData) {
+        setTempData(newTempData);
+    }
+
+    function changeActionList(newActionList) {
+        setActions(newActionList);
+        const newVariableExpressions = [];
+        newActionList.forEach((action) => {
+            let expression = createVariableExpression(action);
+            if (expression[0] === '(') expression = expression.slice(1, -1);
+            if (expression) newVariableExpressions.push(expression);
+        })
+        setVariableExpressions(newVariableExpressions);
+        setIsInputTestData(true);
+    }
+
+    function addTestData(newTestData) {
+        setTestDataList([...testDataList, newTestData]);
+    }
+
+
+
+    const createVariableExpression = (action) => {
+        const typeToOperator = {
+          'or': ' | ',
+          'and': ' & '
+        };
+    
+        if (action.type === 'click' || action.type === 'input' || action.type === 'verifyURL') {
+          return action.value || action.url || '';
+        } else if (action.type !== 'open') {
+          const children = action.actions;
+          const childrenExpression = [];
+          children.forEach((child) => {
+            const expression = createVariableExpression(child);
+            if (expression !== '') childrenExpression.push(expression);
+          });
+          const outputExpression = childrenExpression.join(typeToOperator[action.type]);
+          if (childrenExpression.length > 1) return `(${outputExpression})`;
+          else return outputExpression;
+        } else {
+          return '';
+        }
+      }
+    
+    function sendRequestGenScript() {
+        const testcase = {};
+        testcase.actions = actions;
+        testcase.scenario = name;
+        testcase.haveAssert = true;
+        const body = {};
+        body.testcases = [testcase];
+        body.url = actions[0].url;
+        body.variables = variableExpressions;
+        body.storedData = testDataList;
+        console.log(JSON.stringify(body))
+        fetch("http://localhost:8081/v2/getScript", {
+            body: JSON.stringify(body),
+            headers: {
+                'content-type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Access-Control-Allow-Methods': 'POST,PATCH,OPTIONS'
+            },
+            method: "POST",
+        }).then((response) => {
+            return response.text();
+        }).then((data) => {
+            console.log(data);
+            setTestScript(data);
+        })
+    }
     return (
-        <div style={{border: '1px solid black', margin: '5px', padding: '5px'}}>
+        <div style={{ border: '1px solid black', margin: '5px', padding: '5px', borderRadius: '5px'}}>
+            <h1 style={{textAlign: 'center', fontFamily: 'sans-serif'}}>UET UI Testing</h1>
+            <div>
+                <Switch checked={isInputTestData}
+                    onChange={() => setIsInputTestData(!isInputTestData)} />
+            </div>
             <span>Scenario: </span>
-            <InputComponent placeholder="Test Case Name" onChange={changeName}/>
-            <NestedDropdown menuItemsData={menuItemsData}/>
-            <List sx={{ listStyle: "decimal", pl: 2 }}>
+            {/* <Input value={name} placeholder="Test Case Name" onChange={changeName} /> */}
+            <FilledInput
+                value={name}
+                placeholder="Test Case Name"
+                onChange={changeName}
+                inputProps={{ style: { textAlign: "center", fontStyle: "italic", padding: 0 } }}
+            />
             {
-                actions.map((action, index) => {
-                    return (
-                        <ListItem key={index} sx={{display: "list-item"}}>
-                            <Action {...action} actionIndexes={[...actionIndexes, index]} testcaseIndex={testcaseIndex}/>
-                        </ListItem>
-                    )
-                })
+                isInputTestData? 
+                <TestActionList actions={actions} variableExpressions={variableExpressions} tempData={tempData} changeTempData={changeTempData} addTestData={addTestData}/> 
+                : <TestOutline flow={flow} changeActionList={changeActionList} setNewFlow={setNewFlow} />
             }
-            </List>
-            
-        
-        
+            {
+                isInputTestData && testDataList.length > 0
+                && <DataTable variableExpressions={variableExpressions} dataList={testDataList}/>
+            }
+            {
+                isInputTestData && testDataList.length > 0 
+                && <Button style={{marginTop: '10px'}} size="small" variant="contained" onClick={sendRequestGenScript}>Generate Script</Button>
+            }
+            {
+                isInputTestData &&testScript
+                && <TestScript script={testScript}/>
+            }
         </div>
     );
 }

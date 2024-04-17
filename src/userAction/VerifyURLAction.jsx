@@ -24,6 +24,5 @@ export function VerifyURlAction({actionIndexes, testcaseIndex}) {
             <span>Verify the current URL is </span>
             <InputComponent initialValue={expectedURL || ""} onChange={handleChange}/>
         </div>
-        
     )
 }
