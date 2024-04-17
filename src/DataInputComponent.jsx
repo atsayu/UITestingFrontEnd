@@ -1,5 +1,4 @@
 
-import { InputComponent } from './components/InputComponent'
 import { Button, Input } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
