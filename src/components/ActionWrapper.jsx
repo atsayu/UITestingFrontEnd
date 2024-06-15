@@ -5,7 +5,7 @@ import VerifyURLAction from './VerifyURLAction'
 import OpenURLAction from './OpenURLAction'
 import AndExpressionAction from './AndExpressionAction'
 import SelectAction from './SelectAction'
-import { OrExpression } from '../userAction/OrExpression'
+import OrExpressionAction from './OrExpressionAction'
 import { Divider } from '@mui/material'
 
 export default function ActionWrapper(props) {
@@ -30,7 +30,7 @@ export default function ActionWrapper(props) {
             ActionComponent = <AndExpressionAction {...props}/>
             break;
         case "or":
-            ActionComponent = <OrExpression {...props}/>;
+            ActionComponent = <OrExpressionAction {...props}/>;
             break;
     }
     return (

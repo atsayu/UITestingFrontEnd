@@ -9,7 +9,7 @@ export default function OrExpressionAction({ action, tempData, changeTempData, a
                     action.actions.map((action, index) => {
                         return <ListItem key={index}>
                           {
-                            index !=== 0 
+                            index !== 0 
                             && <span style={{margin: '10px'}}>{` | `}</span>
                           }
                             <ActionWrapper
