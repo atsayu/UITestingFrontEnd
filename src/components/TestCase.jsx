@@ -1,16 +1,13 @@
 import { Button, Input, Switch, FilledInput } from "@mui/material";
-import { NestedDropdown } from "mui-nested-menu";
-import Action from "./userAction/Action";
-import { List } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useState } from "react";
-import TestOutline from "./components/TestOutline";
-import TestActionList from "./components/TestActionList";
-import DataTable from "./components/DataTable";
-import TestScript from "./TestScript";
+import TestOutline from "./TestOutline";
+import TestActionList from "./TestActionList";
+import DataTable from "./DataTable";
+import TestScript from "../TestScript";
 
 
 export function TestCase() {
@@ -63,7 +60,7 @@ export function TestCase() {
             'and': ' & '
         };
 
-        if (action.type === 'click' || action.type === 'input' || action.type === 'verifyURL') {
+        if (action.type === 'click' || action.type === 'input' || action.type === 'select' || action.type === 'verifyURL') {
             return action.value || action.url || '';
         } else if (action.type !== 'open') {
             const children = action.actions;

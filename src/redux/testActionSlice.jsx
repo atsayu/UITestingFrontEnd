@@ -210,8 +210,8 @@ export const testActionSlice = createSlice({
             })
             tempAction.actions.push({
                 type: 'select',
-                describedLocator: action.payload.locator,
-                value: action.payload.value
+                answer: action.payload.answer,
+                question: action.payload.question
             })
         },
         addCheckboxAction: (state, action) => {

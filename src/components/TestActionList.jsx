@@ -2,6 +2,7 @@ import React from 'react'
 import ActionWrapper from './ActionWrapper'
 import { Button } from '@mui/material'
 export default function TestActionList({ actions, variableExpressions, tempData, changeTempData, addTestData }) {
+  console.log(actions);
 
   function addData() {
     const newTestData = {};

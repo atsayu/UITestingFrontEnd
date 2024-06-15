@@ -2,11 +2,11 @@ import AddIcon from '@mui/icons-material/Add';
 import { Button, IconButton } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { TestCase } from './TestCase';
+import { TestCase } from './components/TestCase';
 import { addTestCaseEvent } from './redux/actions';
 import { addTestCase, setVerifyActionExist } from './redux/testActionSlice';
 import { useState } from 'react';
-import DataInputComponent from './DataInputComponent';
+import DataInputComponent from './deprecated/DataInputComponent';
 import UrlComponent from './Url';
 import TestScript from './TestScript';
 
@@ -179,7 +179,7 @@ export default function TestSuite() {
     return (
         <div style={{fontFamily: 'sans-serif', margin: '5px'}}>
             {/* <UrlComponent setUrl={setUrl} url={url} /> */}
-            <Button size="small" variant='contained' size="small" onClick={handleAddTestCase}>
+            <Button size="small" variant='contained' onClick={handleAddTestCase}>
                 <AddIcon />
                 <span>New Test Case</span>
             </Button>
