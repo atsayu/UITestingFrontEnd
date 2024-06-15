@@ -18,13 +18,13 @@ Pyeda
 ```bash
    npm install
 ```
-2. Khởi chạy project FrontEnd và truy cập tới đường dẫn [localhost](http://localhost:5173/)
+2. Khởi chạy project Front end và truy cập tới đường dẫn [localhost](http://localhost:5173/)
 
 ```bash
   npm run dev
 ```
 
-3. Khởi chạy project [SpringbootUITestingForm](https://github.com/atsayu/SpringbootUITestingForm)
+3. Khởi chạy project [Scriptgen](https://github.com/atsayu/SpringbootUITestingForm)
 4. Khởi chạy project [LocatorDetector](https://github.com/atsayu/TSDV_UITesting)
 5. Mở terminal tại thư mục và chạy file `tb_server.py`
 ```bash
