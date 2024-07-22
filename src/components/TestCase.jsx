@@ -60,7 +60,7 @@ export function TestCase() {
             'and': ' & '
         };
 
-        if (action.type === 'click' || action.type === 'input' || action.type === 'select' || action.type === 'verifyURL') {
+        if (action.type === 'click' || action.type === 'input' || action.type === 'select' || action.type === 'verifyURL' || action.type === 'checkbox') {
             return action.value || action.url || '';
         } else if (action.type !== 'open') {
             const children = action.actions;
@@ -87,7 +87,7 @@ export function TestCase() {
         body.testcases = [testcase];
         body.url = actions[0].url;
         body.variables = variableExpressions;
-        body.storedData = testDataList;
+        body["storedData"] = testDataList;
         console.log(JSON.stringify(body))
         fetch("http://localhost:8081/v2/getScript", {
             body: JSON.stringify(body),

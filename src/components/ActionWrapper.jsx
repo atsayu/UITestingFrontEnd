@@ -6,6 +6,7 @@ import OpenURLAction from './OpenURLAction'
 import AndExpressionAction from './AndExpressionAction'
 import SelectAction from './SelectAction'
 import OrExpressionAction from './OrExpressionAction'
+import CheckboxAction from './CheckboxAction'
 import { Divider } from '@mui/material'
 
 export default function ActionWrapper(props) {
@@ -25,6 +26,9 @@ export default function ActionWrapper(props) {
             break;
         case "select":
             ActionComponent = <SelectAction {...props} />;
+            break;
+        case "checkbox":
+            ActionComponent = <CheckboxAction {...props} />;
             break;
         case "and": 
             ActionComponent = <AndExpressionAction {...props}/>
