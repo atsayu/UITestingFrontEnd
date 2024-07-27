@@ -1,4 +1,4 @@
-import { Button, Input, Switch, FilledInput } from "@mui/material";
+import { Button, TextField, FilledInput } from "@mui/material";
 
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import Backdrop from '@mui/material/Backdrop';
@@ -20,6 +20,8 @@ export function TestCase() {
     const [tempData, setTempData] = useState({});
     const [variableExpressions, setVariableExpressions] = useState([]);
     const [testScript, setTestScript] = useState();
+    const [url, setUrl] = useState('');
+    const [description, setDescription] = useState('');
 
     function changeName(e) {
         const newName = e.target.value;
@@ -137,6 +139,32 @@ export function TestCase() {
             setIsLoading(false);
         });
     }
+
+    function handleGenScenario() {
+        if (description === "") {
+            alert("Please input description");
+        } else {
+            //CALL API LLM
+            const body = {url, description};
+            fetch("LLM_API_URL", {
+                headers: {
+                    'content-type': 'application/json',
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'POST,PATCH,OPTIONS'
+                },
+                body: JSON.stringify(body),
+                method: "POST",
+            }).then((response) => {
+                return response.text();
+            }).then((data) => {
+                console.log(data);
+                setFlow(data);
+            }).catch(err => {
+                console.log("Error get scenario from LLM: ", err);
+                setIsLoading(false);
+            });
+        }
+    }
     return (
         <div style={{ border: '1px solid black', margin: '5px', padding: '5px', borderRadius: '5px', fontFamily: 'sans-serif' }}>
             <Backdrop
@@ -158,20 +186,49 @@ export function TestCase() {
                             setTestScript(undefined);
                         }}
                         startIcon={<ArrowBackIosNewIcon />}
-                        // endIcon={<EditIcon />}
+                    // endIcon={<EditIcon />}
                     >
                         Change Actions
                     </Button>
                 }
             </div>
-            <span>Scenario: </span>
-            {/* <Input value={name} placeholder="Test Case Name" onChange={changeName} /> */}
-            <FilledInput
-                value={name}
-                placeholder="Test Case Name"
-                onChange={changeName}
-                inputProps={{ style: { textAlign: "center", fontStyle: "italic", padding: 0 } }}
-            />
+            <div style={{ margin: '5px' }}>
+                <span>Scenario: </span>
+                <FilledInput
+                    value={name}
+                    placeholder="Test Case Name"
+                    onChange={changeName}
+                    inputProps={{ style: { textAlign: "center", fontStyle: "italic", padding: 0 } }}
+                />
+            </div>
+            <div style={{ margin: '5px' }}>
+                <span>URL: </span>
+                <FilledInput
+                    value={url}
+                    placeholder="Web site url"
+                    onChange={(e) => setUrl(e.target.value)}
+                    inputProps={{ style: { textAlign: "center", fontStyle: "italic", padding: 0 } }}
+                />
+            </div>
+            <div style={{ margin: '5px' }}>
+                <span>Description: </span>
+                <TextField
+                    value={description}
+                    size='small'
+                    onChange={(e) => setDescription(e.target.value)} variant='outlined'
+                    multiline rows={5} fullWidth
+                    placeholder='Describe the scenario for LLM genration'
+                    style={{ marginTop: '20px' }}
+                />
+            </div>
+            <Button style={{ margin: '10px', padding: '2px' }}
+                size="small" variant="contained"
+                onClick={handleGenScenario}
+            >
+                GENERATE SCENARIO
+            </Button>
+
+
             {
                 isInputTestData ?
                     <TestActionList actions={actions} variableExpressions={variableExpressions} tempData={tempData} changeTempData={changeTempData} addTestData={addTestData} />

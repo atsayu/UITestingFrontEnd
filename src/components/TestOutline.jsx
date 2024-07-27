@@ -3,8 +3,12 @@ import { TextField, Button } from '@mui/material'
 export default function TestOutline({flow, setNewFlow, changeActionList}) {
     function turnFlowToAction() {
         const lines = flow.split("\n");
+        const preprocessedLines = lines.map((line) => {
+            return line.replace(/^[^a-zA-Z]+/, '').trim();
+        })
+        console.log(preprocessedLines);
         fetch("http://localhost:8081/parse-flow", {
-            body: JSON.stringify(lines),
+            body: JSON.stringify(preprocessedLines),
             headers: {
                 'content-type': 'application/json',
                 // 'charser': 'utf-8',
