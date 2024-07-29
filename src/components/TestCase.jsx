@@ -1,4 +1,4 @@
-import { Button, TextField, FilledInput } from "@mui/material";
+import { Button, Switch, FilledInput } from "@mui/material";
 
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import Backdrop from '@mui/material/Backdrop';
@@ -14,14 +14,15 @@ export function TestCase() {
     const [isLoading, setIsLoading] = useState(false);
     const [isInputTestData, setIsInputTestData] = useState(false);
     const [flow, setFlow] = useState("");
-    const [name, setName] = useState("");
+    const [scenario, setScenario] = useState("");
     const [actions, setActions] = useState([]);
     const [testDataList, setTestDataList] = useState([]);
     const [tempData, setTempData] = useState({});
     const [variableExpressions, setVariableExpressions] = useState([]);
     const [testScript, setTestScript] = useState();
     const [url, setUrl] = useState('');
-    const [description, setDescription] = useState('');
+    const [isRequiredLogin, setIsRequiredLogin] = useState(false);
+    const [editFlowEnabled, setEditFlowEnabled] = useState(false);
 
     function changeName(e) {
         const newName = e.target.value;
@@ -141,24 +142,32 @@ export function TestCase() {
     }
 
     function handleGenScenario() {
-        if (description === "") {
-            alert("Please input description");
+        if (scenario === "") {
+            alert("Please input a scenario");
         } else {
             //CALL API LLM
-            const body = {url, description};
-            fetch("LLM_API_URL", {
+            const reqBody = {
+                isRequiredLogin: isRequiredLogin,
+                url: url,
+                action: scenario
+            };
+            console.log(reqBody)
+            setIsLoading(true);
+            fetch("http://localhost:8081/generate-test-scenario", {
                 headers: {
                     'content-type': 'application/json',
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'POST,PATCH,OPTIONS'
                 },
-                body: JSON.stringify(body),
+                body: JSON.stringify(reqBody),
                 method: "POST",
             }).then((response) => {
                 return response.text();
             }).then((data) => {
-                console.log(data);
+
+                setEditFlowEnabled(true);
                 setFlow(data);
+                setIsLoading(false);
             }).catch(err => {
                 console.log("Error get scenario from LLM: ", err);
                 setIsLoading(false);
@@ -195,32 +204,26 @@ export function TestCase() {
             <div style={{ margin: '5px' }}>
                 <span>Scenario: </span>
                 <FilledInput
-                    value={name}
-                    placeholder="Test Case Name"
-                    onChange={changeName}
+                    value={scenario}
+                    placeholder="Specify a scenario"
+                    onChange={(e) => setScenario(e.target.value)}
                     inputProps={{ style: { textAlign: "center", fontStyle: "italic", padding: 0 } }}
                 />
+            </div>
+            <div style={{ margin: '5px' }}>
+                <span>Required login </span>
+                <Switch checked={isRequiredLogin} onClick={() => setIsRequiredLogin(isRequiredLogin => !isRequiredLogin)}/>
             </div>
             <div style={{ margin: '5px' }}>
                 <span>URL: </span>
                 <FilledInput
                     value={url}
-                    placeholder="Web site url"
+                    placeholder="Target website url"
                     onChange={(e) => setUrl(e.target.value)}
                     inputProps={{ style: { textAlign: "center", fontStyle: "italic", padding: 0 } }}
                 />
             </div>
-            <div style={{ margin: '5px' }}>
-                <span>Description: </span>
-                <TextField
-                    value={description}
-                    size='small'
-                    onChange={(e) => setDescription(e.target.value)} variant='outlined'
-                    multiline rows={5} fullWidth
-                    placeholder='Describe the scenario for LLM genration'
-                    style={{ marginTop: '20px' }}
-                />
-            </div>
+    
             <Button style={{ margin: '10px', padding: '2px' }}
                 size="small" variant="contained"
                 onClick={handleGenScenario}
@@ -232,7 +235,7 @@ export function TestCase() {
             {
                 isInputTestData ?
                     <TestActionList actions={actions} variableExpressions={variableExpressions} tempData={tempData} changeTempData={changeTempData} addTestData={addTestData} />
-                    : <TestOutline clearTestData={clearTestData} flow={flow} changeActionList={changeActionList} setNewFlow={setNewFlow} />
+                    : <TestOutline clearTestData={clearTestData} editFlowEnabled={editFlowEnabled} flow={flow} changeActionList={changeActionList} setNewFlow={setNewFlow} />
             }
             {
                 isInputTestData && testDataList.length > 0
