@@ -1,10 +1,8 @@
-import { configureStore } from "@reduxjs/toolkit";
-import testActionSliceReducer from "./testActionSlice";
+import { configureStore } from '@reduxjs/toolkit';
+import scenarioListSliceReducer from './scenarioListSlice';
 
-const store = configureStore({
-    reducer: {
-        testAction: testActionSliceReducer,
-    },
+export const store = configureStore({
+  reducer: {
+    scenarioList: scenarioListSliceReducer,
+  },
 });
-
-export default store;

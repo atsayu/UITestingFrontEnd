@@ -195,7 +195,6 @@ export function TestCase() {
                             setTestScript(undefined);
                         }}
                         startIcon={<ArrowBackIosNewIcon />}
-                    // endIcon={<EditIcon />}
                     >
                         Change Actions
                     </Button>
@@ -212,7 +211,7 @@ export function TestCase() {
             </div>
             <div style={{ margin: '5px' }}>
                 <span>Required login </span>
-                <Switch checked={isRequiredLogin} onClick={() => setIsRequiredLogin(isRequiredLogin => !isRequiredLogin)}/>
+                <Switch checked={isRequiredLogin} onClick={() => setIsRequiredLogin(isRequiredLogin => !isRequiredLogin)} />
             </div>
             <div style={{ margin: '5px' }}>
                 <span>URL: </span>
@@ -223,7 +222,7 @@ export function TestCase() {
                     inputProps={{ style: { textAlign: "center", fontStyle: "italic", padding: 0 } }}
                 />
             </div>
-    
+
             <Button style={{ margin: '10px', padding: '2px' }}
                 size="small" variant="contained"
                 onClick={handleGenScenario}
@@ -255,4 +254,35 @@ export function TestCase() {
             }
         </div>
     );
+}
+
+
+scenario = {
+    required: -1, /* -1: not required; 0, 1, 2, ...: required scenario with index of 1, 2, 3, ... */
+    img: "base64",
+    name: "string",
+    url: "string", //if required !== -1 then url = ""
+    actions: [
+        {
+            type: "open", // "open", "click", "input", "select", "verifyURL", "checkbox", "and", "or"
+            describedLocator: "string",
+            "other fields for specify type": "string",
+        },
+
+        {
+            type: "and",
+            actions: [
+                {
+                    type: "open", // "open", "click", "input", "select", "verifyURL", "checkbox", "and", "or"
+                    describedLocator: "string",
+                    "other fields for specify type": "string",
+                }
+            ]
+        }
+    ],
+    validDataSets: [
+        {
+            //key value
+        }
+    ],
 }

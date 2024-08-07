@@ -1,10 +1,8 @@
-import UrlComponent from './Url'
-import TestSuite from './TestSuite'
-import { TestCase } from './components/TestCase'
+import ScenarioList from './ScenarioList'
 
 function App() {
   return (
-    <TestCase />
+    <ScenarioList />
     
   )
 }
